@@ -1,0 +1,49 @@
+# ===== Spring Boot =====
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# ===== Secrets =====
+application.properties
+application.yml
+application-*.properties
+application-*.yml
+.env
+.env.*
+
+# ===== Logs =====
+logs/
+*.log
+
+# ===== Maven =====
+.mvn/wrapper/maven-wrapper.jar
+
+# ===== IDEs =====
+.idea/
+*.iws
+*.iml
+*.ipr
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.vscode/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Security =====
+*.pem
+*.key
+*.crt
+*.jks
+*.p12
+
+# ===== Node (optional) =====
+node_modules/
+npm-debug.log*
