@@ -1,4 +1,4 @@
-package com.univ.auth_service.services;
+package com.univ.auth_service.services.impl;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -13,6 +13,7 @@ import com.univ.auth_service.entities.User;
 import com.univ.auth_service.exception.ResourceNotFoundException;
 import com.univ.auth_service.helpers.UserHelper;
 import com.univ.auth_service.repositories.UserRepository;
+import com.univ.auth_service.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
