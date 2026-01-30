@@ -2,11 +2,15 @@ package com.univ.auth_service.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.univ.auth_service.dtos.LoginRequest;
+import com.univ.auth_service.dtos.TokenResponse;
 import com.univ.auth_service.dtos.UserDTO;
 import com.univ.auth_service.services.AuthService;
 
@@ -18,6 +22,22 @@ import lombok.AllArgsConstructor;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthenticationManager authenticationManger;
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest loginRequest) {
+        authenticate(loginRequest);
+        return null;
+    }
+
+    private void authenticate(LoginRequest loginRequest) {
+        try {
+            authenticationManger.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
+            
+        } catch (Exception e) {
+            
+        }
+    }
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
