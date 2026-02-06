@@ -16,7 +16,7 @@ import com.univ.auth_service.entities.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwts;        
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.Setter;
