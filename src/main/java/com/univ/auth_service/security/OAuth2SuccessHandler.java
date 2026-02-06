@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -18,66 +17,94 @@ import com.univ.auth_service.entities.User;
 import com.univ.auth_service.repositories.RefreshTokenRepository;
 import com.univ.auth_service.repositories.UserRepository;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final CookieService cookieService;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+    @Value("${app.auth.frontend.success-redirect}")
+    private String frontendSuccessUrl;
 
-        logger.info("Successful Authentication");
-        logger.info(authentication.toString());
+    @Override
+    @Transactional
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
+
+        log.info("Successful Authentication");
+        log.info(authentication.toString());
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        String registrationId = "unknown";
-        if (authentication instanceof OAuth2AuthenticationToken token) {
-            registrationId = token.getAuthorizedClientRegistrationId();
-        }
 
-        logger.info("registrationId" + registrationId);
-        logger.info("user" + oAuth2User.getAttributes().toString());
+        String registrationId = (authentication instanceof OAuth2AuthenticationToken token)
+                ? token.getAuthorizedClientRegistrationId()
+                : "unknown";
+
+        log.info("registrationId: {}", registrationId);
+        log.info("user attributes: {}", oAuth2User.getAttributes());
+
         User user;
+
         switch (registrationId) {
+
             case "google" -> {
-                String googleId = oAuth2User.getAttributes().getOrDefault("sub", "").toString();
-                String email = oAuth2User.getAttributes().getOrDefault("email", "").toString();
-                String name = oAuth2User.getAttributes().getOrDefault("name", "").toString();
-                String picture = oAuth2User.getAttributes().getOrDefault("picture", "").toString();
+                String googleId = (String) oAuth2User.getAttributes().get("sub");
+                String email = (String) oAuth2User.getAttributes().get("email");
+                String name = (String) oAuth2User.getAttributes().get("name");
+                String picture = (String) oAuth2User.getAttributes().get("picture");
 
-                user = User.builder()
-                        .email(email)
-                        .name(name)
-                        .image(picture)
-                        .provider(Provider.GOOGLE)
-                        .build();
-
-                userRepository.findByEmail(email).ifPresentOrElse(user1 -> {
-                    logger.info("User is there in database");
-                    logger.info(user1.toString());
-                }, () -> {
-                    userRepository.save(user);
-                });
+                user = userRepository.findByEmail(email)
+                        .orElseGet(() -> userRepository.save(
+                                User.builder()
+                                        .email(email)
+                                        .name(name)
+                                        .image(picture)
+                                        .enable(true)
+                                        .provider(Provider.GOOGLE)
+                                        .providerId(googleId)
+                                        .build()));
             }
 
-            default -> {
-                throw new RuntimeException("Invalid registration id");
+            case "github" -> {
+                String githubId = String.valueOf(oAuth2User.getAttributes().get("id"));
+                String name = (String) oAuth2User.getAttributes().get("login");
+                String rawEmail = (String) oAuth2User.getAttributes().get("email");
+                String image = (String) oAuth2User.getAttributes().get("avatar_url");
+
+                final String email = (rawEmail == null || rawEmail.isBlank())
+                        ? name + "@github.com"
+                        : rawEmail;
+
+                user = userRepository.findByEmail(email)
+                        .orElseGet(() -> userRepository.save(
+                                User.builder()
+                                        .email(email)
+                                        .name(name)
+                                        .image(image)
+                                        .enable(true)
+                                        .provider(Provider.GITHUB)
+                                        .providerId(githubId)
+                                        .build()));
             }
+
+            default -> throw new RuntimeException("Invalid OAuth2 provider");
         }
 
-        // Refresh Token
+        // ---------- Refresh Token ----------
         String jti = UUID.randomUUID().toString();
+
         RefreshToken refreshTokenOb = RefreshToken.builder()
                 .jti(jti)
                 .user(user)
@@ -87,12 +114,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .build();
 
         refreshTokenRepository.save(refreshTokenOb);
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user, refreshTokenOb.getJti());
 
-        cookieService.attachRefreshCookie(response, refreshToken, (int) jwtService.getRefreshTtlSeconds());
+        String refreshToken = jwtService.generateRefreshToken(user, jti);
 
-        response.getWriter().write("Login Successful");
+        cookieService.attachRefreshCookie(
+                response,
+                refreshToken,
+                (int) jwtService.getRefreshTtlSeconds());
+
+        response.sendRedirect(frontendSuccessUrl);
     }
-
 }

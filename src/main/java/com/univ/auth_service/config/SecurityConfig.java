@@ -1,6 +1,5 @@
 package com.univ.auth_service.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -42,7 +41,7 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/error").permitAll()
+                        .requestMatchers(AppConstants.AUTH_PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated())
 
                 .oauth2Login(oauth2 -> oauth2.successHandler(successHandler)
