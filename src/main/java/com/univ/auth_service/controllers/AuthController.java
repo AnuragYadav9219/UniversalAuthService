@@ -45,7 +45,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final AuthenticationManager authenticationManger;
+    private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final ModelMapper mapper;
@@ -86,7 +86,7 @@ public class AuthController {
 
     private Authentication authenticate(LoginRequest loginRequest) {
         try {
-            return authenticationManger.authenticate(
+            return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
 
         } catch (Exception e) {
