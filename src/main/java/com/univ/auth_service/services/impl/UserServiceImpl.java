@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
         // TODO: change password updation logic
         if (userDTO.getPassword() != null)
             existingUser.setPassword(userDTO.getPassword());
-        existingUser.setEnable(userDTO.isEnable());
+        existingUser.setEnable(userDTO.getEnable());
         existingUser.setUpdatedAt(Instant.now());
         User updatedUser = userRepository.save(existingUser);
         return modelMapper.map(updatedUser, UserDTO.class);

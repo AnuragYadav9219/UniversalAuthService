@@ -30,91 +30,88 @@ import com.univ.auth_service.security.JwtAuthenticationFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-    private AuthenticationSuccessHandler successHandler;
+        private JwtAuthenticationFilter jwtAuthenticationFilter;
+        private AuthenticationSuccessHandler successHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-            AuthenticationSuccessHandler successHandler) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.successHandler = successHandler;
-    }
+        public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                        AuthenticationSuccessHandler successHandler) {
+                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+                this.successHandler = successHandler;
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http.csrf(AbstractHttpConfigurer::disable)
+                                .cors(Customizer.withDefaults())
+                                .logout(AbstractHttpConfigurer::disable)
+                                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(AppConstants.AUTH_PUBLIC_URLS).permitAll()
+                                                .anyRequest().authenticated())
 
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .logout(AbstractHttpConfigurer::disable)
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AppConstants.AUTH_PUBLIC_URLS).permitAll()
-                        .anyRequest().authenticated())
+                                .oauth2Login(oauth2 -> oauth2.successHandler(successHandler)
+                                                .failureHandler(null))
+                                .logout(AbstractHttpConfigurer::disable)
 
-                .oauth2Login(oauth2 -> oauth2.successHandler(successHandler)
-                        .failureHandler(null))
-                .logout(AbstractHttpConfigurer::disable)
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                                                        response.setContentType("application/json");
+                                                        ApiError apiError = ApiError.of(
+                                                                        HttpStatus.UNAUTHORIZED.value(),
+                                                                        "Unauthorized Access",
+                                                                        authException.getMessage(),
+                                                                        request.getRequestURI());
 
-                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+                                                        response.getWriter().write("""
+                                                                        {
+                                                                          "status": %d,
+                                                                          "error": "%s",
+                                                                          "message": "%s",
+                                                                          "path": "%s",
+                                                                          "timestamp": "%s"
+                                                                        }
+                                                                        """.formatted(
+                                                                        apiError.status(),
+                                                                        apiError.error(),
+                                                                        apiError.message(),
+                                                                        apiError.path(),
+                                                                        apiError.timestamp()));
+                                                }))
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    response.setContentType("application/json");
+                return http.build();
+        }
 
-                    ApiError apiError = ApiError.of(
-                            HttpStatus.UNAUTHORIZED.value(),
-                            "Unauthorized Access",
-                            authException.getMessage(),
-                            request.getRequestURI());
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-                    response.getWriter().write("""
-                            {
-                              "status": %d,
-                              "error": "%s",
-                              "message": "%s",
-                              "path": "%s",
-                              "timestamp": "%s"
-                            }
-                            """.formatted(
-                            apiError.status(),
-                            apiError.error(),
-                            apiError.message(),
-                            apiError.path(),
-                            apiError.timestamp()));
-                }))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public AuthenticationManager authenticationManager(
+                        AuthenticationConfiguration configuration) throws Exception {
+                return configuration.getAuthenticationManager();
+        }
 
-        return http.build();
-    }
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource(
+                        @Value("${app.cors.front-end-url}") String corsUrls) {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                List<String> allowedOrigins = Arrays
+                                .stream(corsUrls.split(","))
+                                .map(String::trim)
+                                .toList();
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOrigins(allowedOrigins);
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"));
+                config.setAllowedHeaders(List.of("*"));
+                config.setAllowCredentials(true);
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.front-end-url}") String corsUrls) {
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
 
-        List<String> allowedOrigins = Arrays
-                .stream(corsUrls.split(","))
-                .map(String::trim)
-                .toList();
-
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(allowedOrigins);
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return source;
-    }
+                return source;
+        }
 }

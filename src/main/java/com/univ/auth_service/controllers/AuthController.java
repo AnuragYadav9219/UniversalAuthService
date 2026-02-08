@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.univ.auth_service.dtos.LoginRequest;
 import com.univ.auth_service.dtos.RefreshTokenRequest;
+import com.univ.auth_service.dtos.RegisterRequest;
 import com.univ.auth_service.dtos.TokenResponse;
 import com.univ.auth_service.dtos.UserDTO;
 import com.univ.auth_service.entities.RefreshToken;
@@ -222,7 +223,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(userDTO));
+    public ResponseEntity<UserDTO> registerUser(@RequestBody RegisterRequest req) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(req));
     }
 }
