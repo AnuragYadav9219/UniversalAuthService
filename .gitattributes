@@ -1,2 +1,10 @@
-/mvnw text eol=lf
+# Normalize line endings
+* text=auto
+
+# Shell scripts
+*.sh text eol=lf
+mvnw text eol=lf
+
+# Windows scripts
 *.cmd text eol=crlf
+*.bat text eol=crlf
