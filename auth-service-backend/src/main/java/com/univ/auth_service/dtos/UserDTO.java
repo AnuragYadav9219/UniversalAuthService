@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.univ.auth_service.entities.Provider;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +26,9 @@ public class UserDTO {
     private String name;
     private String password;
     private String image;
-    private Boolean enable = true;
+
+    @JsonProperty(defaultValue = "true")
+    private Boolean enable;
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
     private Provider provider = Provider.LOCAL;

@@ -1,7 +1,12 @@
 import { NavLink } from "react-router"
 import { Button } from "./ui/button"
+import useAuth from "@/auth/store"
 
 const Navbar = () => {
+    const checkLogin = useAuth((state) => state.checkLogin);
+    const user = useAuth((state) => state.user);
+    const logout = useAuth((state) => state.logout);
+
     return (
         <nav className="py-5 dark:border-b border-gray-700 md:py-0 flex md:flex-row gap-4 md:gap-0 flex-col md:h-14 justify-around items-center">
             <div className="font-semibold flex gap-2 items-center">
@@ -12,21 +17,33 @@ const Navbar = () => {
             </div>
 
             <div className="flex gap-4 items-center">
-                <NavLink to={'/'}>
-                    Home
-                </NavLink>
+                {checkLogin() ?
+                    <>
+                        <NavLink to={'#!'}>
+                            {user?.name}
+                        </NavLink>
 
-                <NavLink to={'/login'}>
-                    <Button size={"sm"} className="cursor-pointer" variant={"outline"}>
-                        Login
-                    </Button>
-                </NavLink>
+                        <Button onClick={() => { logout(); }} size={"sm"} className="cursor-pointer" variant={"outline"}>
+                            Logout
+                        </Button>
 
-                <NavLink to={'/signup'}>
-                    <Button size={"sm"} className="cursor-pointer" variant={"outline"}>
-                        Signup
-                    </Button>
-                </NavLink>
+                    </> : <>
+                        <NavLink to={'/'}>
+                            Home
+                        </NavLink>
+
+                        <NavLink to={'/login'}>
+                            <Button size={"sm"} className="cursor-pointer" variant={"outline"}>
+                                Login
+                            </Button>
+                        </NavLink>
+
+                        <NavLink to={'/signup'}>
+                            <Button size={"sm"} className="cursor-pointer" variant={"outline"}>
+                                Signup
+                            </Button>
+                        </NavLink></>
+                }
             </div>
         </nav>
     )

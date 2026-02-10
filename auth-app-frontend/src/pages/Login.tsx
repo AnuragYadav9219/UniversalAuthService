@@ -16,10 +16,10 @@ import type LoginData from "@/models/LoginData"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router"
 import { isValidEmail } from "@/utils/validators"
-import { loginUser } from "@/services/AuthService"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import getLoginErrorMessage from "@/utils/errors"
 import { Spinner } from "@/components/ui/spinner"
+import useAuth from "@/auth/store"
 
 const Login = () => {
   const [loginData, setLoginData] = useState<LoginData>({
@@ -31,6 +31,7 @@ const Login = () => {
   const [error, setError] = useState<any>(null);
 
   const navigate = useNavigate();
+  const login = useAuth((state) => state.login);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
@@ -55,8 +56,12 @@ const Login = () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await loginUser(loginData);
-      console.log(result);
+
+      // Login function : useAuth
+      await login(loginData);
+
+      // const result = await loginUser(loginData);
+      // console.log(result);
       toast.success("Logged In Successfully");
 
       navigate("/dashboard")

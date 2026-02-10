@@ -22,7 +22,9 @@ const Signup = () => {
   const [data, setData] = useState<RegisterData>({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    image: '',
+    enable: true
   });
 
   // text, input, email, password, number, textarea 
@@ -53,6 +55,12 @@ const Signup = () => {
       return;
     }
 
+    if (!data.name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+
+
     const passwordError = isValidPassword(data.password);
 
     if (passwordError) {
@@ -62,21 +70,29 @@ const Signup = () => {
 
     // Form submit for registrations
     try {
-      const result = await registerUser(data);
-      console.log(result);
+      setLoading(true);
+      await registerUser(data);
       toast.success("User Registered Successfully");
 
       setData({
         name: '',
         email: '',
-        password: ''
+        password: '',
+        image: '',
+        enable: true
       });
 
       navigate("/login");
 
     } catch (error: any) {
-      console.log("Full Error:", error);
-      toast.error("Error in registering the user");
+      console.log("Full Error : ", error.response?.data);
+
+      toast.error(
+        error.response?.data?.message || error.response?.data?.error || "Registration Failed"
+      );
+
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -205,14 +221,10 @@ const Signup = () => {
 
               {/* Submit */}
               <Button
-                className="
-                cursor-pointer
-                w-full rounded-xl text-lg
-                bg-primary text-primary-foreground
-                hover:opacity-90
-              "
+                disabled={loading}
+                className="cursor-pointer w-full rounded-xl text-lg bg-primary text-primary-foreground hover:opacity-90"
               >
-                Create Account
+                {loading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
 
