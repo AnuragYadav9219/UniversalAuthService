@@ -101,13 +101,22 @@ public class AuthController {
     public ResponseEntity<TokenResponse> refreshToken(
             @RequestBody(required = false) RefreshTokenRequest body,
             HttpServletResponse response,
-            HttpServletRequest request) {
+            HttpServletRequest request) throws InterruptedException {
 
-        String refreshToken = readRefreshTokenFromRequest(body, request)
-                .orElseThrow(() -> new BadCredentialsException("Refresh Token is missing"));
+        Thread.sleep(5000);
+
+        Optional<String> optionalToken = readRefreshTokenFromRequest(body, request);
+
+        if (optionalToken.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .build();
+        }
+
+        String refreshToken = optionalToken.get();
 
         if (!jwtService.isRefreshToken(refreshToken)) {
-            throw new BadCredentialsException("Invalid Refresh Token Type");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String jti = jwtService.getJti(refreshToken);

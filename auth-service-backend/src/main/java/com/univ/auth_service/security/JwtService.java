@@ -15,8 +15,9 @@ import com.univ.auth_service.entities.Role;
 import com.univ.auth_service.entities.User;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;        
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.Setter;
@@ -93,8 +94,10 @@ public class JwtService {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (JwtException e) {
-            throw new RuntimeException("Invalid or expired JWT", e);
+        } catch (ExpiredJwtException e) {
+            throw new JwtException("Invalid or expired JWT");
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new JwtException("Invalid JWT");
         }
     }
 

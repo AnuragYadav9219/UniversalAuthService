@@ -23,14 +23,25 @@ function UserHome() {
     try {
       const response = await getCurrentUser(user.email);
       updateUser(response);
-      toast.success("User refreshed successfully")
-      console.log("FULL RESPONSE: ", response);
+      toast.success("You are able to access secured APIs");
 
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Error getting user data")
     }
   }
+
+  const testSecuredApi = async () => {
+    try {
+      const response = await getCurrentUser(user!.email);
+      console.log("API Response:", response);
+      toast.success("Secured API working");
+
+    } catch (error: any) {
+      console.log("Status:", error?.response?.status);
+      toast.error(`Error ${error?.response?.status}`);
+    }
+  };
 
   if (!user) {
     return (
@@ -57,9 +68,19 @@ function UserHome() {
             </span>
           </h1>
 
-          <Button onClick={getUserData} className="rounded-xl">
-            Refresh Profile
-          </Button>
+          <div className="flex gap-3">
+            <Button onClick={getUserData} className="rounded-xl">
+              Refresh Profile
+            </Button>
+
+            <Button
+              onClick={testSecuredApi}
+              variant="secondary"
+              className="rounded-xl"
+            >
+              Test Secured API
+            </Button>
+          </div>
         </motion.div>
 
         {/* Account Card */}
