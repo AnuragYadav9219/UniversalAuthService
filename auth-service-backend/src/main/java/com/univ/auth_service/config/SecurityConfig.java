@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(AppConstants.AUTH_PUBLIC_URLS).permitAll()
+                                                .requestMatchers("/api/v1/users/email/**").permitAll()
                                                 .anyRequest().authenticated())
 
                                 .oauth2Login(oauth2 -> oauth2.successHandler(successHandler)

@@ -24,7 +24,7 @@ public class AuthServiceImpl implements AuthService {
                 .name(req.name())
                 .image(req.image())
                 .password(passwordEncoder.encode(req.password()))
-                .enable(true)
+                .enabled(true)
                 .build();
 
         return userService.createUser(userDTO);

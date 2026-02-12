@@ -52,7 +52,7 @@ public class User implements UserDetails {
 
     private String password;
     private String image;
-    private boolean enable = true;
+    private boolean enabled = true;
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 
@@ -107,6 +107,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.enable;
+        return this.enabled;
     }
 }

@@ -15,6 +15,8 @@ type AuthState = {
     login: (data: LoginData) => Promise<void>;
     logout: (silent?: boolean) => Promise<void>;
     checkLogin: () => boolean;
+
+    updateUser: (user: User) => void;
 };
 
 const useAuth = create<AuthState>()(
@@ -62,7 +64,13 @@ const useAuth = create<AuthState>()(
                 }
             },
 
-            checkLogin: () => Boolean(get().accessToken && get().authStatus),
+            checkLogin: () =>
+                Boolean(get().accessToken && get().authStatus),
+
+            updateUser: (updatedUser) =>
+                set(() => ({
+                    user: updatedUser,
+                })),
         }),
         {
             name: LOCAL_KEY,
@@ -74,5 +82,6 @@ const useAuth = create<AuthState>()(
         }
     )
 );
+
 
 export default useAuth;

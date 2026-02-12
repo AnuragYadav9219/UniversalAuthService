@@ -67,7 +67,7 @@ const Login = () => {
       navigate("/dashboard")
 
     } catch (error: any) {
-      console.log("Full Error:", error);
+      console.error("Login Error:", error);
 
       setError(error);
 

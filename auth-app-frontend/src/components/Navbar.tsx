@@ -1,4 +1,4 @@
-import { NavLink } from "react-router"
+import { NavLink, useNavigate } from "react-router"
 import { Button } from "./ui/button"
 import useAuth from "@/auth/store"
 
@@ -6,6 +6,7 @@ const Navbar = () => {
     const checkLogin = useAuth((state) => state.checkLogin);
     const user = useAuth((state) => state.user);
     const logout = useAuth((state) => state.logout);
+    const navigate = useNavigate();
 
     return (
         <nav className="py-5 dark:border-b border-gray-700 md:py-0 flex md:flex-row gap-4 md:gap-0 flex-col md:h-14 justify-around items-center">
@@ -19,11 +20,11 @@ const Navbar = () => {
             <div className="flex gap-4 items-center">
                 {checkLogin() ?
                     <>
-                        <NavLink to={'#!'}>
+                        <NavLink to={'/dashboard/profile'}>
                             {user?.name}
                         </NavLink>
 
-                        <Button onClick={() => { logout(); }} size={"sm"} className="cursor-pointer" variant={"outline"}>
+                        <Button onClick={() => { logout(); navigate("/"); }} size={"sm"} className="cursor-pointer" variant={"outline"}>
                             Logout
                         </Button>
 

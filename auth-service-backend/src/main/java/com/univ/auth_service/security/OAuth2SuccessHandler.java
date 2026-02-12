@@ -71,7 +71,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                                         .email(email)
                                         .name(name)
                                         .image(picture)
-                                        .enable(true)
+                                        .enabled(true)
                                         .provider(Provider.GOOGLE)
                                         .providerId(googleId)
                                         .build()));
@@ -93,7 +93,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                                         .email(email)
                                         .name(name)
                                         .image(image)
-                                        .enable(true)
+                                        .enabled(true)
                                         .provider(Provider.GITHUB)
                                         .providerId(githubId)
                                         .build()));
