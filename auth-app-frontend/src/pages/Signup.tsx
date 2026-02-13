@@ -1,4 +1,4 @@
-import { Mail, Lock, User, GithubIcon } from "lucide-react"
+import { Mail, Lock, User } from "lucide-react"
 import { motion } from "framer-motion"
 
 import {
@@ -17,6 +17,7 @@ import type RegisterData from "@/models/RegisterData"
 import { registerUser } from "@/services/AuthService";
 import { useNavigate } from "react-router"
 import { isValidEmail, isValidPassword } from "@/utils/validators"
+import OAuth2Buttons from "@/components/OAuth2Buttons"
 
 const Signup = () => {
   const [data, setData] = useState<RegisterData>({
@@ -59,7 +60,6 @@ const Signup = () => {
       toast.error("Name is required");
       return;
     }
-
 
     const passwordError = isValidPassword(data.password);
 
@@ -118,14 +118,7 @@ const Signup = () => {
         className="w-full max-w-md"
       >
         <Card
-          className="
-            rounded-2xl
-            border border-border
-            bg-card
-            shadow-sm
-            dark:bg-card/80
-            dark:backdrop-blur
-          "
+          className="rounded-2xl border border-border bg-card shadow-sm dark:bg-card/80 dark:backdrop-blur"
         >
           {/* Header */}
           <CardHeader className="text-center space-y-2">
@@ -139,32 +132,6 @@ const Signup = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* OAuth Buttons */}
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full cursor-pointer rounded-xl gap-2 bg-background hover:bg-muted"
-              >
-                <Mail className="h-4 w-4" />
-                Continue with Google
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full cursor-pointer rounded-xl gap-2 bg-background hover:bg-muted"
-              >
-                <GithubIcon className="h-4 w-4" />
-                Continue with GitHub
-              </Button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative text-center">
-              <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
-              <span className="relative z-10 bg-background px-2 text-xs text-muted-foreground">
-                OR
-              </span>
-            </div>
 
             {/* Form Fields */}
             <form onSubmit={handleFormSubmit} className="space-y-4">
@@ -227,6 +194,19 @@ const Signup = () => {
                 {loading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
+
+            {/* Divider */}
+            <div className="relative text-center">
+              <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
+              <span className="relative z-10 bg-background px-2 text-xs text-muted-foreground">
+                OR
+              </span>
+            </div>
+
+            {/* OAuth Buttons */}
+            <div className="space-y-3">
+              <OAuth2Buttons />
+            </div>
 
             {/* Footer */}
             <p className="text-center text-sm text-muted-foreground">

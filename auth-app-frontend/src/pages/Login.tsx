@@ -1,4 +1,4 @@
-import { Mail, Lock, GithubIcon, AlertCircle } from "lucide-react"
+import { Mail, Lock, AlertCircle } from "lucide-react"
 import { motion } from "framer-motion"
 
 import {
@@ -20,6 +20,7 @@ import { Alert, AlertTitle } from "@/components/ui/alert"
 import getLoginErrorMessage from "@/utils/errors"
 import { Spinner } from "@/components/ui/spinner"
 import useAuth from "@/auth/store"
+import OAuth2Buttons from "@/components/OAuth2Buttons"
 
 const Login = () => {
   const [loginData, setLoginData] = useState<LoginData>({
@@ -122,40 +123,6 @@ const Login = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* OAuth Buttons */}
-            <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="
-                  w-full rounded-xl gap-2
-                  bg-background
-                  hover:bg-muted
-                "
-              >
-                <Mail className="h-4 w-4" />
-                Continue with Google
-              </Button>
-
-              <Button
-                variant="outline"
-                className="
-                  w-full rounded-xl gap-2
-                  bg-background
-                  hover:bg-muted
-                "
-              >
-                <GithubIcon className="h-4 w-4" />
-                Continue with GitHub
-              </Button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative text-center">
-              <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
-              <span className="relative z-10 bg-background px-2 text-xs text-muted-foreground">
-                OR
-              </span>
-            </div>
 
             {/* Error Section */}
             {error && (
@@ -220,6 +187,19 @@ const Login = () => {
                 ) : "Login"}
               </Button>
             </form>
+
+            {/* Divider */}
+            <div className="relative text-center">
+              <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
+              <span className="relative z-10 bg-background px-2 text-xs text-muted-foreground">
+                OR
+              </span>
+            </div>
+
+            {/* OAuth2 Buttons */}
+            <div>
+              <OAuth2Buttons />
+            </div>
 
             {/* Footer */}
             <p className="text-center text-sm text-muted-foreground">
