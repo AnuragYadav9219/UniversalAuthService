@@ -122,3 +122,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  caret-color: transparent;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  caret-color: auto;
+}
