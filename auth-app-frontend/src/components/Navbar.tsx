@@ -2,8 +2,12 @@ import { NavLink, useNavigate } from "react-router";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useAuth from "@/auth/store";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const Navbar = () => {
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
     const checkLogin = useAuth((state) => state.checkLogin);
     const user = useAuth((state) => state.user);
     const logout = useAuth((state) => state.logout);
@@ -58,15 +62,24 @@ const Navbar = () => {
 
                             {/* Logout */}
                             <Button
-                                onClick={() => {
-                                    logout()
+                                onClick={async () => {
+                                    setIsLoggingOut(true)
+                                    await logout()
                                     navigate("/")
                                 }}
+                                disabled={isLoggingOut}
                                 size="sm"
                                 variant="outline"
                                 className="rounded-xl cursor-pointer px-5 hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
                             >
-                                Logout
+                                {isLoggingOut ? (
+                                    <span className="flex items-center gap-2">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Logging out...
+                                    </span>
+                                ) : (
+                                    "Logout"
+                                )}
                             </Button>
                         </>
                     ) : (
@@ -99,6 +112,7 @@ const Navbar = () => {
                                     Signup
                                 </Button>
                             </NavLink>
+
                         </>
                     )}
 

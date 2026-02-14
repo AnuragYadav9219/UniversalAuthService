@@ -12,6 +12,7 @@ import UserHome from './pages/users/UserHome.tsx'
 import UserProfile from './pages/users/UserProfile.tsx'
 import OAuthSuccess from './pages/OAuthSuccess.tsx'
 import OAuthFailure from './pages/OAuthFailure.tsx'
+import Security from './pages/Security.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/services' element={<Services />} />
+        <Route path='/security' element={<Security />} />
         <Route path='/about' element={<About />} />
         <Route path='/dashboard' element={<UserLayout />} >
           <Route index element={<UserHome />} />

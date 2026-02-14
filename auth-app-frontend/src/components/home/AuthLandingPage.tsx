@@ -2,8 +2,11 @@ import { ShieldCheck, Lock, Zap, Fingerprint, ArrowRight, Star } from "lucide-re
 import { motion } from "framer-motion"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
+import { useNavigate } from "react-router"
 
 export default function AuthLandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors">
       {/* HERO / CTA */}
@@ -28,7 +31,11 @@ export default function AuthLandingPage() {
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg" className="rounded-2xl px-8 text-lg">
+            <Button
+              onClick={() => navigate("/signup")}
+              size="lg"
+              className="rounded-2xl cursor-pointer px-8 text-lg"
+            >
               Get Started <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
@@ -91,7 +98,12 @@ export default function AuthLandingPage() {
             Plug-and-play auth with OAuth2, JWT, MFA, and passwordless login.
             Designed for modern React and API-driven systems.
           </p>
-          <Button className="mt-8 rounded-xl">Explore Security</Button>
+          <Button
+            onClick={() => navigate("/security")}
+            className="mt-8 cursor-pointer rounded-xl"
+          >
+            Explore Security
+          </Button>
         </div>
 
         <div className="relative">
@@ -142,7 +154,11 @@ export default function AuthLandingPage() {
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
             Start building with a production-ready authentication system today.
           </p>
-          <Button size="lg" className="mt-8 rounded-2xl px-10 text-lg">
+          <Button
+            onClick={() => navigate("/login")}
+            size="lg"
+            className="mt-8 cursor-pointer rounded-2xl px-10 text-lg"
+          >
             Launch Now
           </Button>
         </div>
@@ -150,7 +166,7 @@ export default function AuthLandingPage() {
 
       {/* FOOTER */}
       <footer className="border-t py-10 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} AuthX. Built for light & dark mode.
+        © {new Date().getFullYear()} AuthX. All rights reserved.
       </footer>
     </div>
   )
